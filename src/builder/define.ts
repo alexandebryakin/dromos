@@ -99,7 +99,7 @@ const _convertStructsToRoutes = <DefineRoutesResult>(
 const _getBuilder = <DefineRoutesResult>(): RouteBuilder<DefineRoutesResult> => {
   const structs: Struct<DefineRoutesResult>[] = []
 
-  const define: FnResourcesDefiner<DefineRoutesResult> = (name, options = {}) => {
+  const define: FnResourcesDefiner<DefineRoutesResult> = (name, options: ResourcesOptions = {}) => {
     const struct: Struct<DefineRoutesResult> = {
       name,
       options,
