@@ -1,11 +1,11 @@
 {
   "name": "dromos",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lib that allows to define and build routes eloquently.",
   "author": "alexandebryakin",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/esm/index.d.ts",
+  "main": "./dist/cjs/index",
+  "module": "./dist/esm/index",
+  "types": "./dist/esm/index",
   "keywords": [
     "react",
     "react-router",
