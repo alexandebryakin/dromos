@@ -1,5 +1,6 @@
 import { Config, Notation } from './builder'
-import { kebabize } from './kebabize'
+import { kebabize } from './notation/kebabize'
+import { snakecasize } from './notation/snakecasize'
 
 type ICallable = (id?: ID) => string
 type ICallableResult = ICallable | string
@@ -40,9 +41,10 @@ type FnResourcesDefiner<DefineRoutesResult> = (
 const nonEmpty = (val: unknown) => !!val
 
 const TO_STRING_ALIAS = '_'
+const LEADING_FORWARD_SLASH = '/'
 
 const _makeStringifiable = (f: ICallable): CallableFn => {
-  const toString = () => f()
+  const toString = () => LEADING_FORWARD_SLASH + f()
   // @ts-expect-error
   const result: CallableFn = f
   result.toString = toString
@@ -50,12 +52,17 @@ const _makeStringifiable = (f: ICallable): CallableFn => {
   return result
 }
 
+type FnTransformer = (str: string) => string
 const _transformName = (name: string, options: ResourcesOptions, config: Config) => {
-  // const defaultNotation: Notation = 'camelCase';
+  const notation = options.notation || config.notation
 
-  const isKebab = options.notation === 'kebab-case' || config.notation === 'kebab-case'
+  const transform: FnTransformer = {
+    'kebab-case': kebabize,
+    snake_case: snakecasize,
+    camelCase: (str: string) => str,
+  }[notation]
 
-  return isKebab ? kebabize(name) : name
+  return transform(name)
 }
 
 const _buildSubroute = <DefineRoutesResult>(
