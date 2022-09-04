@@ -45,24 +45,24 @@ describe('builder', () => {
     }, config)
 
     it('bulds paths properly', () => {
-      expect(routes.profile()._).toBe('profile')
+      expect(routes.profile()._).toBe('/profile')
 
-      expect(routes.users()._).toBe('users')
-      expect(routes.users(123)._).toBe('users/123')
-      expect(routes.users('abc-def')._).toBe('users/abc-def')
+      expect(routes.users()._).toBe('/users')
+      expect(routes.users(123)._).toBe('/users/123')
+      expect(routes.users('abc-def')._).toBe('/users/abc-def')
 
-      expect(routes.users().properties()._).toBe('users/properties')
-      expect(routes.users().properties('p1')._).toBe('users/properties/p1')
-      expect(routes.users('u1').properties('p1')._).toBe('users/u1/properties/p1')
+      expect(routes.users().properties()._).toBe('/users/properties')
+      expect(routes.users().properties('p1')._).toBe('/users/properties/p1')
+      expect(routes.users('u1').properties('p1')._).toBe('/users/u1/properties/p1')
 
-      expect(routes.users('u1').properties('p1').else()._).toBe('users/u1/properties/p1/else')
+      expect(routes.users('u1').properties('p1').else()._).toBe('/users/u1/properties/p1/else')
 
-      expect(routes.users().friends()._).toBe('users/friends')
-      expect(routes.users().friends('f1')._).toBe('users/friends/f1')
-      expect(routes.users('u1').friends('f1')._).toBe('users/u1/friends/f1')
+      expect(routes.users().friends()._).toBe('/users/friends')
+      expect(routes.users().friends('f1')._).toBe('/users/friends/f1')
+      expect(routes.users('u1').friends('f1')._).toBe('/users/u1/friends/f1')
 
-      expect(routes.settings().general()._).toBe('settings/general')
-      expect(routes.settings().password()._).toBe('settings/password')
+      expect(routes.settings().general()._).toBe('/settings/general')
+      expect(routes.settings().password()._).toBe('/settings/password')
     })
   })
 
@@ -86,9 +86,9 @@ describe('builder', () => {
     }, config)
 
     it('builds paths in camelCase', () => {
-      expect(routes.generalSettings()._).toBe('generalSettings')
-      expect(routes.generalSettings().editEmail()._).toBe('generalSettings/editEmail')
-      expect(routes.generalSettings().changePassword()._).toBe('generalSettings/changePassword')
+      expect(routes.generalSettings()._).toBe('/generalSettings')
+      expect(routes.generalSettings().editEmail()._).toBe('/generalSettings/editEmail')
+      expect(routes.generalSettings().changePassword()._).toBe('/generalSettings/changePassword')
     })
   })
 
@@ -112,13 +112,37 @@ describe('builder', () => {
     }, config)
 
     it('builds paths in camelCase', () => {
-      expect(routes.generalSettings()._).toBe('general-settings')
-      expect(routes.generalSettings().editEmail()._).toBe('general-settings/edit-email')
-      expect(routes.generalSettings().changePassword()._).toBe('general-settings/change-password')
+      expect(routes.generalSettings()._).toBe('/general-settings')
+      expect(routes.generalSettings().editEmail()._).toBe('/general-settings/edit-email')
+      expect(routes.generalSettings().changePassword()._).toBe('/general-settings/change-password')
     })
   })
 
-  it.todo('config.notation: snake_case')
+  describe('config.notation: snake_case', () => {
+    const config: Config = {
+      notation: 'snake_case',
+    }
+
+    type Routes = {
+      generalSettings: Subroute<{
+        editEmail: Route
+        changePassword: Route
+      }>
+    }
+
+    const routes = builder.define<Routes>((root) => {
+      root.define('generalSettings').subroutes((profile) => {
+        profile.define('editEmail')
+        profile.define('changePassword')
+      })
+    }, config)
+
+    it('builds paths in snake_case', () => {
+      expect(routes.generalSettings()._).toBe('/general_settings')
+      expect(routes.generalSettings().editEmail()._).toBe('/general_settings/edit_email')
+      expect(routes.generalSettings().changePassword()._).toBe('/general_settings/change_password')
+    })
+  })
 
   describe('config.notation combined with options.notation', () => {
     const config: Config = {
@@ -144,21 +168,21 @@ describe('builder', () => {
         })
         profile.define('changePassword').subroutes((changePassword) => {
           changePassword.define('oneThing', { notation: 'kebab-case' })
-          changePassword.define('anotherThing')
+          changePassword.define('anotherThing', { notation: 'snake_case' })
         })
       })
     }, config)
 
     it('builds paths in camelCase', () => {
-      expect(routes.generalSettings()._).toBe('generalSettings')
+      expect(routes.generalSettings()._).toBe('/generalSettings')
 
-      expect(routes.generalSettings().editEmail()._).toBe('generalSettings/edit-email')
-      expect(routes.generalSettings().editEmail().primaryEmail()._).toBe('generalSettings/edit-email/primaryEmail')
+      expect(routes.generalSettings().editEmail()._).toBe('/generalSettings/edit-email')
+      expect(routes.generalSettings().editEmail().primaryEmail()._).toBe('/generalSettings/edit-email/primaryEmail')
 
-      expect(routes.generalSettings().changePassword()._).toBe('generalSettings/changePassword')
-      expect(routes.generalSettings().changePassword().oneThing()._).toBe('generalSettings/changePassword/one-thing')
+      expect(routes.generalSettings().changePassword()._).toBe('/generalSettings/changePassword')
+      expect(routes.generalSettings().changePassword().oneThing()._).toBe('/generalSettings/changePassword/one-thing')
       expect(routes.generalSettings().changePassword().anotherThing()._).toBe(
-        'generalSettings/changePassword/anotherThing',
+        '/generalSettings/changePassword/another_thing',
       )
     })
   })

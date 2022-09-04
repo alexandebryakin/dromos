@@ -12,9 +12,8 @@ export type Subroute<T> = {
   (id?: ID): T & StringifiableRoute
 }
 
-export type Notation = 'kebab-case' | 'camelCase'
+export type Notation = 'kebab-case' | 'camelCase' | 'snake_case'
 export type Config = {
-  // [TODO]: add `snake_case` support
   notation: Notation
 }
 

@@ -61,24 +61,24 @@ export const routes = builder.define<Routes>((root) => {
 and use it:
 
 ```ts
-routes.profile()._ // → → 'profile'
+routes.profile()._ // → '/profile'
 
-routes.users()._ // → 'users'
-routes.users(123)._ // → 'users/123'
-routes.users('abc-def')._ // → 'users/abc-def'
+routes.users()._ // → '/users'
+routes.users(123)._ // → '/users/123'
+routes.users('abc-def')._ // → '/users/abc-def'
 
-routes.users().properties()._ // → 'users/properties'
-routes.users().properties('p1')._ // → 'users/properties/p1'
-routes.users('u1').properties('p1')._ // → 'users/u1/properties/p1'
-routes.users('u1').properties('p1').hotels()._ // → 'users/u1/properties/p1/hotels'
-routes.users('u1').properties('p1').houses()._ // → 'users/u1/properties/p1/houses'
+routes.users().properties()._ // → '/users/properties'
+routes.users().properties('p1')._ // → '/users/properties/p1'
+routes.users('u1').properties('p1')._ // → '/users/u1/properties/p1'
+routes.users('u1').properties('p1').hotels()._ // → '/users/u1/properties/p1/hotels'
+routes.users('u1').properties('p1').houses()._ // → '/users/u1/properties/p1/houses'
 
-routes.users().friends()._ // → 'users/friends'
-routes.users().friends('f1')._ // → 'users/friends/f1'
-routes.users('u1').friends('f1')._ // → 'users/u1/friends/f1'
+routes.users().friends()._ // → '/users/friends'
+routes.users().friends('f1')._ // → '/users/friends/f1'
+routes.users('u1').friends('f1')._ // → '/users/u1/friends/f1'
 
-routes.settings().general()._ // → 'settings/general'
-routes.settings().password()._ // → 'settings/password'
+routes.settings().general()._ // → '/settings/general'
+routes.settings().password()._ // → '/settings/password'
 ```
 
 ## Config
@@ -91,7 +91,7 @@ allows to specify the notation that will be used to generate pathnames
 | -------------- | ------- | --------------------- |
 | **camelCase**  | default | available             |
 | **kebab-case** |         | available             |
-| **snake_case** |         | TODO                  |
+| **snake_case** |         | available             |
 
 **Example**
 
@@ -117,9 +117,9 @@ export const routes = builder.define<Routes>((root) => {
 }, config)
 
 // [Usage]:
-routes.mainPath()._ // → 'main-path'
-routes.mainPath().subPath()._ // → 'main-path/sub-path'
-routes.mainPath().anotherSubPath()._ // → 'main-path/another-sub-path'
+routes.mainPath()._ // → '/main-path'
+routes.mainPath().subPath()._ // → '/main-path/sub-path'
+routes.mainPath().anotherSubPath()._ // → '/main-path/another-sub-path'
 ```
 
 ## Options
@@ -141,6 +141,7 @@ type Routes = {
   mainPath: Subroute<{
     subPath: Subroute<{
       innerSubPath: Route
+      anotherInnerPath: Route
     }>
   }>
 }
@@ -149,14 +150,16 @@ export const routes = builder.define<Routes>((root) => {
   root.define('mainPath').subroutes((mainPath) => {
     mainPath.define('subPath', { notation: 'camelCase' }).subroutes((subPath) => {
       subPath.define('innerSubPath')
+      subPath.define('anotherInnerPath', { notation: 'snake_case' })
     })
   })
 }, config)
 
 // [Usage]:
-routes.mainPath()._ // → 'main-path'
-routes.mainPath().subPath()._ // → 'main-path/subPath'
-routes.mainPath().subPath().innerSubPath()._ // → 'main-path/subPath/inner-sub-path'
+routes.mainPath()._ // → '/main-path'
+routes.mainPath().subPath()._ // → '/main-path/subPath'
+routes.mainPath().subPath().innerSubPath()._ // → '/main-path/subPath/inner-sub-path'
+routes.mainPath().subPath().anotherInnerPath()._ // → '/main-path/subPath/another_inner_path'
 ```
 
 ## builder.from
@@ -205,14 +208,14 @@ const schema: Schema = {
 const routes = builder.from<Routes>(schema, config)
 
 // [Usage]:
-routes.profile()._ // → → 'profile'
+routes.profile()._ // → '/profile'
 
-routes.users()._ // → 'users'
-routes.users('u1').properties('p1').hotels()._ // → 'users/u1/properties/p1/hotels'
-routes.users('u1').properties('p1').houses()._ // → 'users/u1/properties/p1/houses'
+routes.users()._ // → '/users'
+routes.users('u1').properties('p1').hotels()._ // → '/users/u1/properties/p1/hotels'
+routes.users('u1').properties('p1').houses()._ // → '/users/u1/properties/p1/houses'
 
-routes.settings().general()._ // → 'settings/general'
-routes.settings().password()._ // → 'settings/password'
+routes.settings().general()._ // → '/settings/general'
+routes.settings().password()._ // → '/settings/password'
 ```
 
 ## Future Plans
